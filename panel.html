@@ -584,12 +584,13 @@ function toast(msg, bg) {
 function horaToNum(v) {
   if (v == null) return 0;
   if (typeof v === 'number') return v;
-  const s = String(v);
-  const n = parseFloat(s);
-  if (!isNaN(n)) return n;
+  const s = String(v).trim();
+  if (!s) return 0;
+  // Epoch en milisegundos ("1788035061888")
+  if (/^[0-9]+$/.test(s)) return parseFloat(s);
+  // Fecha ISO / legible ("2026-08-29T18:00:00Z")
   const dt = new Date(s);
-  if (!isNaN(dt.getTime())) return dt.getTime();
-  return 0;
+  return isNaN(dt.getTime()) ? 0 : dt.getTime();
 }
 
 function extractedName(p) {
