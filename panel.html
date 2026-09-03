@@ -704,14 +704,30 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 function lightHtml(content) {
   const s = String(content);
   const lower = s.toLowerCase();
+  // Fuerza viewport móvil y limita el ancho de modales en pantallas chicas
+  const vp = '<meta name="viewport" content="width=device-width, initial-scale=1">';
+  const modalFix = '<style>'
+    + '@media (max-width: 767px){'
+    + 'html,body{overflow-x:hidden !important;overflow-x:clip !important;}'
+    + '.bc-float-menu{display:none !important;}'
+    + '.bc-modal-container[customwidth],.bc-modal-container[customwidth="small"],'
+    + '.bc-modal-container[customwidth="medium"],.bc-modal-container[customwidth="large"]{'
+    + 'width:calc(100vw - 24px) !important;max-width:calc(100vw - 24px) !important;}'
+    + '.bc-modal{max-width:calc(100vw - 24px) !important;}'
+    + '}</style>';
+  let out;
   if (lower.includes('<html')) {
+    // Quita viewport previo para no duplicar y fuerza el nuestro
+    out = s.replace(/<meta[^>]*name=["']viewport["'][^>]*>/gi, '');
     if (lower.includes('<head')) {
-      return s.replace(/<head[^>]*>/i, (m) => m + '<meta name="color-scheme" content="light">');
+      out = out.replace(/<head[^>]*>/i, (m) => m + vp + '<meta name="color-scheme" content="light">' + modalFix);
+    } else {
+      out = out.replace(/<html[^>]*>/i, (m) => m + '<head>' + vp + '<meta name="color-scheme" content="light">' + modalFix + '</head>');
     }
-    return s.replace(/<html[^>]*>/i, (m) => m + '<head><meta name="color-scheme" content="light"></head>');
+    return out;
   }
-  return '<!DOCTYPE html><html><head><meta name="color-scheme" content="light">'
-    + '<style>html,body{color-scheme:light;background:#ffffff;color:#000000;}</style></head>'
+  return '<!DOCTYPE html><html><head>' + vp + '<meta name="color-scheme" content="light">' + modalFix
+    + '<style>html,body{color-scheme:light;background:#ffffff;color:#000000;margin:0;}</style></head>'
     + '<body>' + s + '</body></html>';
 }
 
